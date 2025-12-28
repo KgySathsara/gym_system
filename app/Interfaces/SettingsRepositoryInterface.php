@@ -9,4 +9,7 @@ interface SettingsRepositoryInterface
     public function clearCache();
     public function runOptimize();
     public function runMigrations();
+
+    // ✅ ADD THIS
+    public function performMaintenance();
 }

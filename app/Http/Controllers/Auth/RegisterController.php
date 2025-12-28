@@ -6,9 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Services\AuthService;
 use App\Services\MemberService;
 use App\Services\TrainerService;
+use App\Models\Plan;
 use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\View\View;
 use Illuminate\Support\Facades\DB;
 
 class RegisterController extends Controller
@@ -19,18 +18,12 @@ class RegisterController extends Controller
         private TrainerService $trainerService
     ) {}
 
-    /**
-     * Show the registration form.
-     */
-    public function showRegistrationForm(): View
+    public function showRegistrationForm()
     {
         return view('auth.register');
     }
 
-    /**
-     * Handle a registration request.
-     */
-    public function register(Request $request): RedirectResponse
+    public function register(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -45,44 +38,38 @@ class RegisterController extends Controller
         try {
             DB::beginTransaction();
 
-            // Create user
-            $user = $this->authService->register([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'password' => $validated['password'],
-                'role' => $validated['role'],
-                'phone' => $validated['phone'] ?? null,
-                'address' => $validated['address'] ?? null,
-                'date_of_birth' => $validated['date_of_birth'] ?? null,
-            ]);
+            // 1️⃣ Create USER (ONLY ONCE)
+            $user = $this->authService->register($validated);
 
-            // Create role-specific record
+            // 2️⃣ ROLE BASED CREATION
             if ($validated['role'] === 'trainer') {
+
+                // TRAINER REGISTRATION
                 $this->trainerService->createTrainer([
                     'user_id' => $user->id,
-                    'specialization' => 'General Fitness', // Default specialization
+                    'specialization' => 'General Fitness',
                     'experience_years' => 0,
                     'hourly_rate' => 0,
                     'is_available' => true,
                 ]);
-            } else {
-                // For members, we'll assign a default plan and set basic info
-                $basicPlan = \App\Models\Plan::where('name', 'Basic Plan')->first();
 
-                if ($basicPlan) {
-                    $this->memberService->createMember([
-                        'user_id' => $user->id,
-                        'plan_id' => $basicPlan->id,
-                        'join_date' => now(),
-                        'expiry_date' => now()->addDays($basicPlan->duration_days),
-                        'status' => 'active',
-                    ]);
-                }
+            } else {
+
+                // MEMBER REGISTRATION
+                $plan = Plan::where('name', 'Basic Plan')->firstOrFail();
+
+                $this->memberService->createMember([
+                    'user_id' => $user->id,
+                    'plan_id' => $plan->id,
+                    'join_date' => now(),
+                    'expiry_date' => now()->addDays($plan->duration_days),
+                    'status' => 'active',
+                ]);
             }
 
             DB::commit();
 
-            // Auto-login after registration
+            // 3️⃣ AUTO LOGIN
             $this->authService->login([
                 'email' => $validated['email'],
                 'password' => $validated['password'],
@@ -90,14 +77,14 @@ class RegisterController extends Controller
 
             $request->session()->regenerate();
 
-            return redirect('/')->with('success', 'Registration successful! Welcome to FitLife Gym.');
+            return redirect('/')->with('success', 'Registration successful!');
 
         } catch (\Exception $e) {
             DB::rollBack();
 
-            return back()->withErrors([
-                'email' => 'Registration failed. Please try again.',
-            ])->withInput();
+            return back()
+                ->withErrors(['error' => 'Registration failed. Please try again.'])
+                ->withInput();
         }
     }
 }

@@ -164,4 +164,20 @@ class SettingsRepository implements SettingsRepositoryInterface
             'enable_sms_notifications' => false,
         ];
     }
+
+    public function performMaintenance()
+    {
+        $results = [];
+
+        $results['cache'] = $this->clearCache();
+        $results['optimize'] = $this->runOptimize();
+        $results['migrate'] = $this->runMigrations();
+
+        return [
+            'status' => true,
+            'message' => 'Maintenance tasks executed successfully',
+            'details' => $results,
+        ];
+    }
+
 }

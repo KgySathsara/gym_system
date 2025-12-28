@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Interfaces\MemberRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Models\Member;
+use Illuminate\Support\Facades\DB;
 
 class MemberService
 {
@@ -13,84 +14,99 @@ class MemberService
         private UserRepositoryInterface $userRepository
     ) {}
 
+    /**
+     * Get all members (paginated)
+     */
     public function getAllMembers()
     {
         return $this->memberRepository->getAllMembers();
     }
 
-    public function getMemberById($memberId)
+    /**
+     * Get single member by ID
+     */
+    public function getMemberById($memberId): ?Member
     {
         return $this->memberRepository->getMemberById($memberId);
     }
 
+    /**
+     * Create MEMBER ONLY (User must already exist)
+     */
     public function createMember(array $memberDetails)
     {
-        // First create user
-        $user = $this->userRepository->createUser([
-            'name' => $memberDetails['name'],
-            'email' => $memberDetails['email'],
-            'password' => $memberDetails['password'],
-            'role' => 'member',
-            'phone' => $memberDetails['phone'],
-            'address' => $memberDetails['address'],
-            'date_of_birth' => $memberDetails['date_of_birth'],
-        ]);
-
-        // Then create member
         return $this->memberRepository->createMember([
-            'user_id' => $user->id,
-            'trainer_id' => $memberDetails['trainer_id'],
+            'user_id' => $memberDetails['user_id'],
+            'trainer_id' => $memberDetails['trainer_id'] ?? null,
             'plan_id' => $memberDetails['plan_id'],
             'join_date' => $memberDetails['join_date'],
             'expiry_date' => $memberDetails['expiry_date'],
             'status' => $memberDetails['status'],
-            'height' => $memberDetails['height'],
-            'weight' => $memberDetails['weight'],
-            'medical_conditions' => $memberDetails['medical_conditions'],
-            'fitness_goals' => $memberDetails['fitness_goals'],
         ]);
     }
 
-    public function updateMember($memberId, array $newDetails)
+
+    /**
+     * Update member + user basic info
+     */
+    public function updateMember($memberId, array $newDetails): bool
     {
-        $member = $this->memberRepository->getMemberById($memberId);
+        return DB::transaction(function () use ($memberId, $newDetails) {
 
-        // Update user details if provided
-        if (isset($newDetails['name']) || isset($newDetails['email'])) {
-            $userDetails = [];
-            if (isset($newDetails['name'])) $userDetails['name'] = $newDetails['name'];
-            if (isset($newDetails['email'])) $userDetails['email'] = $newDetails['email'];
-            if (isset($newDetails['phone'])) $userDetails['phone'] = $newDetails['phone'];
-            if (isset($newDetails['address'])) $userDetails['address'] = $newDetails['address'];
-            if (isset($newDetails['date_of_birth'])) $userDetails['date_of_birth'] = $newDetails['date_of_birth'];
+            $member = $this->memberRepository->getMemberById($memberId);
 
-            $this->userRepository->updateUser($member->user_id, $userDetails);
-        }
-
-        // Update member details
-        $memberDetails = array_filter($newDetails, function($key) {
-            return in_array($key, [
-                'trainer_id', 'plan_id', 'join_date', 'expiry_date', 'status',
-                'height', 'weight', 'medical_conditions', 'fitness_goals'
+            // Update USER data
+            $this->userRepository->updateUser($member->user_id, [
+                'name' => $newDetails['name'],
+                'email' => $newDetails['email'],
+                'phone' => $newDetails['phone'] ?? null,
+                'address' => $newDetails['address'] ?? null,
+                'date_of_birth' => $newDetails['date_of_birth'] ?? null,
             ]);
-        }, ARRAY_FILTER_USE_KEY);
 
-        return $this->memberRepository->updateMember($memberId, $memberDetails);
+            // ✅ Update MEMBER data (trainer_id MUST be saved even if null)
+            return $this->memberRepository->updateMember($memberId, [
+                'trainer_id' => $newDetails['trainer_id'] ?? null, // ✅ FIX
+                'plan_id' => $newDetails['plan_id'],
+                'join_date' => $newDetails['join_date'],
+                'expiry_date' => $newDetails['expiry_date'],
+                'status' => $newDetails['status'],
+                'height' => $newDetails['height'] ?? null,
+                'weight' => $newDetails['weight'] ?? null,
+                'medical_conditions' => $newDetails['medical_conditions'] ?? null,
+                'fitness_goals' => $newDetails['fitness_goals'] ?? null,
+            ]);
+        });
     }
 
-    public function deleteMember($memberId)
+    /**
+     * Delete member + user
+     */
+    public function deleteMember($memberId): bool
     {
-        $member = $this->memberRepository->getMemberById($memberId);
-        $this->userRepository->deleteUser($member->user_id);
-        return $this->memberRepository->deleteMember($memberId);
+        return DB::transaction(function () use ($memberId) {
+
+            $member = $this->memberRepository->getMemberById($memberId);
+
+            $this->memberRepository->deleteMember($memberId);
+            $this->userRepository->deleteUser($member->user_id);
+
+            return true;
+        });
     }
 
+    /**
+     * Get active members
+     */
     public function getActiveMembers()
     {
         return $this->memberRepository->getActiveMembers();
     }
 
-    public function searchMembers($searchTerm)
+    /**
+     * Search members
+     */
+    public function searchMembers(string $searchTerm)
     {
         return $this->memberRepository->searchMembers($searchTerm);
     }

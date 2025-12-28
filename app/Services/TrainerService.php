@@ -24,38 +24,12 @@ class TrainerService
 
     public function createTrainer(array $trainerDetails)
     {
-        // First create user
-        $user = $this->userRepository->createUser([
-            'name' => $trainerDetails['name'],
-            'email' => $trainerDetails['email'],
-            'password' => $trainerDetails['password'],
-            'role' => 'trainer',
-            'phone' => $trainerDetails['phone'] ?? null,
-            'address' => $trainerDetails['address'] ?? null,
-            'date_of_birth' => $trainerDetails['date_of_birth'] ?? null,
-        ]);
-
-        // Default working hours if not provided
-        $defaultWorkingHours = [
-            'monday' => ['09:00-17:00'],
-            'tuesday' => ['09:00-17:00'],
-            'wednesday' => ['09:00-17:00'],
-            'thursday' => ['09:00-17:00'],
-            'friday' => ['09:00-15:00'],
-            'saturday' => ['10:00-14:00'],
-            'sunday' => ['closed']
-        ];
-
-        // Then create trainer
         return $this->trainerRepository->createTrainer([
-            'user_id' => $user->id,
+            'user_id' => $trainerDetails['user_id'],
             'specialization' => $trainerDetails['specialization'],
             'experience_years' => $trainerDetails['experience_years'],
-            'certifications' => $trainerDetails['certifications'] ?? null,
-            'bio' => $trainerDetails['bio'] ?? null,
             'hourly_rate' => $trainerDetails['hourly_rate'],
-            'is_available' => $trainerDetails['is_available'] ?? true,
-            'working_hours' => $trainerDetails['working_hours'] ?? $defaultWorkingHours,
+            'is_available' => $trainerDetails['is_available'],
         ]);
     }
 
