@@ -6,6 +6,8 @@ use App\Interfaces\MemberRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Models\Member;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class MemberService
 {
@@ -43,8 +45,38 @@ class MemberService
             'expiry_date' => $memberDetails['expiry_date'],
             'status' => $memberDetails['status'],
         ]);
+
+        return User::create($data);
     }
 
+
+    public function uploadProfileImage($image)
+    {
+        $fileName = time().'_'.Str::random(20).'.'.$image->getClientOriginalExtension();
+
+        $image->storeAs('profiles', $fileName, 'public');
+
+        return $fileName;
+    }
+
+    public function updateMemberPhoto(int $memberId, $image): void
+    {
+        $member = $this->memberRepository->getMemberById($memberId);
+        $user = $member->user;
+
+        // Delete old image
+        if ($user->profile_image) {
+            Storage::disk('public')->delete('profiles/' . $user->profile_image);
+        }
+
+        $fileName = time() . '_' . Str::random(20) . '.' . $image->getClientOriginalExtension();
+
+        $image->storeAs('profiles', $fileName, 'public');
+
+        $user->update([
+            'profile_image' => $fileName,
+        ]);
+    }
 
     /**
      * Update member + user basic info

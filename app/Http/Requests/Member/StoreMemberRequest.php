@@ -17,6 +17,7 @@ class StoreMemberRequest extends FormRequest
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8',
+            'profile_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
             'date_of_birth' => 'nullable|date',

@@ -498,6 +498,27 @@
         .back-to-top.show {
             display: flex;
         }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #4f46e5;
+            color: #fff;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .user-avatar .avatar-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
     </style>
 
     @stack('styles')
@@ -601,8 +622,15 @@
                         <div class="dropdown">
                             <div class="user-menu" data-bs-toggle="dropdown">
                                 <div class="user-avatar">
-                                    {{ substr(auth()->user()->name, 0, 1) }}
+                                    @if(auth()->user()->profile_image)
+                                        <img src="{{ asset('storage/profiles/' . auth()->user()->profile_image) }}"
+                                            alt="{{ auth()->user()->name }}"
+                                            class="avatar-img">
+                                    @else
+                                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                    @endif
                                 </div>
+
                                 <div class="user-info">
                                     <span class="user-name">{{ auth()->user()->name }}</span>
                                     <span class="user-role">Administrator</span>
