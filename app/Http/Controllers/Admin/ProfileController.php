@@ -29,21 +29,25 @@ class ProfileController extends Controller
             $user = Auth::user();
             $data = $request->validated();
 
-            // Handle password change separately
+            // Upload profile image
+            if ($request->hasFile('profile_image')) {
+                $data['profile_image'] = $request->file('profile_image');
+            }
+
+            // Password change
             if ($request->filled('current_password')) {
                 $this->profileService->updatePassword($data, $user);
                 unset($data['current_password'], $data['new_password'], $data['new_password_confirmation']);
             }
 
-            // Update profile data
-            if (!empty($data)) {
-                $this->profileService->updateProfile($data, $user);
-            }
+            // Update profile
+            $this->profileService->updateProfile($data, $user);
 
-            return redirect()->route('profile.edit')->with('success', 'Profile updated successfully!');
-
+            return redirect()->route('profile.edit')
+                ->with('success', 'Profile updated successfully!');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', $e->getMessage())->withInput();
+            return back()->with('error', $e->getMessage());
         }
     }
+
 }

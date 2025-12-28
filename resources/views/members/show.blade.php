@@ -25,8 +25,11 @@
                 <h5 class="mb-0">Profile Information</h5>
             </div>
             <div class="card-body text-center">
-                <img src="{{ $member->user->profile_image ? asset('storage/' . $member->user->profile_image) : asset('assets/images/default-avatar.png') }}"
-                     alt="{{ $member->user->name }}" class="rounded-circle mb-3" width="120" height="120">
+                <img src="{{ $member->user->profile_image
+                    ? asset('storage/profiles/' . $member->user->profile_image)
+                    : asset('assets/images/default-avatar.png') }}"
+                                             alt="{{ $member->user->name }}" class="rounded-circle" width="160" height="160">
+
                 <h4>{{ $member->user->name }}</h4>
                 <p class="text-muted">Member ID: {{ $member->id }}</p>
 

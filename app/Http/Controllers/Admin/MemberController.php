@@ -32,10 +32,19 @@ class MemberController extends Controller
         return view('members.create', compact('trainers', 'plans'));
     }
 
-    public function store(StoreMemberRequest $request): RedirectResponse
+    public function store(StoreMemberRequest $request)
     {
-        $member = $this->memberService->createMember($request->validated());
-        return redirect()->route('members.index')->with('success', 'Member created successfully.');
+        $data = $request->validated();
+
+        if ($request->hasFile('profile_image')) {
+            $data['profile_image'] =
+                $this->memberService->uploadProfileImage($request->file('profile_image'));
+        }
+
+        $this->memberService->createMember($data);
+
+        return redirect()->route('members.index')
+            ->with('success', 'Member created successfully');
     }
 
     public function show($id): View
@@ -54,9 +63,22 @@ class MemberController extends Controller
 
     public function update(UpdateMemberRequest $request, $id): RedirectResponse
     {
-        $this->memberService->updateMember($id, $request->validated());
-        return redirect()->route('members.index')->with('success', 'Member updated successfully.');
+        $data = $request->validated();
+
+        if ($request->hasFile('profile_image')) {
+            $this->memberService->updateMemberPhoto(
+                $id,
+                $request->file('profile_image')
+            );
+        }
+
+        $this->memberService->updateMember($id, $data);
+
+        return redirect()
+            ->route('members.index')
+            ->with('success', 'Member updated successfully.');
     }
+
 
     public function destroy($id): RedirectResponse
     {

@@ -28,6 +28,8 @@ class UpdateMemberRequest extends FormRequest
                 Rule::unique('users', 'email')->ignore($userId)
             ],
             'phone' => 'nullable|string|max:20',
+            'profile_image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+
             'address' => 'nullable|string',
             'date_of_birth' => 'nullable|date',
             'trainer_id' => 'nullable|exists:trainers,id',

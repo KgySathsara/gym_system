@@ -27,6 +27,17 @@
                             <h6 class="border-bottom pb-2 mb-3">Personal Information</h6>
 
                             <div class="mb-3">
+                                <label class="form-label">Profile Photo</label>
+                                <input type="file"
+                                    name="profile_image"
+                                    class="form-control @error('profile_image') is-invalid @enderror"
+                                    accept="image/*">
+                                @error('profile_image')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="mb-3">
                                 <label for="name" class="form-label">Full Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control @error('name') is-invalid @enderror"
                                        id="name" name="name" value="{{ old('name') }}" required>
