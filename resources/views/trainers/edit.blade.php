@@ -157,19 +157,45 @@
                                     </div>
                                     <div class="card-body">
                                         <div class="form-group">
-                                            <label for="specialization">Specialization *</label>
-                                            <input type="text"
-                                                   class="form-control @error('specialization') is-invalid @enderror"
-                                                   id="specialization"
-                                                   name="specialization"
-                                                   value="{{ old('specialization', $trainer->specialization) }}"
-                                                   required>
-                                            @error('specialization')
-                                                <span class="invalid-feedback" role="alert">
-                                                    <strong>{{ $message }}</strong>
-                                                </span>
-                                            @enderror
-                                        </div>
+                            <label for="specialization">Specialization <span class="text-danger">*</span></label>
+
+                            <select
+                                class="form-control @error('specialization') is-invalid @enderror"
+                                id="specialization"
+                                name="specialization"
+                                required
+                            >
+                                <option value="">Select Specialization</option>
+
+                                @php
+                                    $specializations = [
+                                        'Personal Training',
+                                        'Yoga',
+                                        'Pilates',
+                                        'CrossFit',
+                                        'Weight Loss',
+                                        'Body Building',
+                                        'Rehabilitation',
+                                    ];
+
+                                    $selectedSpecialization = old('specialization', $trainer->specialization);
+                                @endphp
+
+                                @foreach($specializations as $specialization)
+                                    <option value="{{ $specialization }}"
+                                        {{ $selectedSpecialization === $specialization ? 'selected' : '' }}>
+                                        {{ $specialization }}
+                                    </option>
+                                @endforeach
+                            </select>
+
+                            @error('specialization')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
+                        </div>
+
 
                                         <div class="form-group">
                                             <label for="certifications">Certifications</label>
