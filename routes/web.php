@@ -51,26 +51,19 @@ Route::middleware(['auth'])->group(function () {
 
     // Trainers
     Route::resource('trainers', TrainerController::class);
-    Route::post('/trainers/{trainer}/activate', [TrainerController::class, 'activate'])
-        ->name('trainers.activate');
-    Route::post('/trainers/{trainer}/deactivate', [TrainerController::class, 'deactivate'])
-        ->name('trainers.deactivate');
+    Route::post('/trainers/{trainer}/activate', [TrainerController::class, 'activate'])->name('trainers.activate');
+    Route::post('/trainers/{trainer}/deactivate', [TrainerController::class, 'deactivate'])->name('trainers.deactivate');
 
     // Plans
     Route::resource('plans', PlanController::class);
-    Route::patch('/plans/{id}/toggle-status', [PlanController::class, 'toggleStatus'])
-        ->name('plans.toggle-status');
+    Route::patch('/plans/{id}/toggle-status', [PlanController::class, 'toggleStatus'])->name('plans.toggle-status');
 
     // Payments
     Route::resource('payments', PaymentController::class);
-    Route::get('/payments/{payment}/invoice', [PaymentController::class, 'invoice'])
-        ->name('payments.invoice');
-    Route::get('/payments/{payment}/invoice/download', [PaymentController::class, 'downloadInvoice'])
-        ->name('payments.invoice.download');
-    Route::get('/payments/{payment}/invoice/print', [PaymentController::class, 'printInvoice'])
-        ->name('payments.invoice.print');
-    Route::put('/payments/{payment}/update-status', [PaymentController::class, 'updateStatus'])
-        ->name('payments.update-status');
+    Route::get('/payments/{payment}/invoice', [PaymentController::class, 'invoice'])->name('payments.invoice');
+    Route::get('/payments/{payment}/invoice/download', [PaymentController::class, 'downloadInvoice'])->name('payments.invoice.download');
+    Route::get('/payments/{payment}/invoice/print', [PaymentController::class, 'printInvoice'])->name('payments.invoice.print');
+    Route::put('/payments/{payment}/update-status', [PaymentController::class, 'updateStatus'])->name('payments.update-status');
 
     // Attendance
     Route::prefix('attendance')->name('attendance.')->group(function () {
@@ -91,6 +84,5 @@ Route::middleware(['auth'])->group(function () {
     // Settings
     Route::get('/settings', [SettingsController::class, 'edit'])->name('settings.edit');
     Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update');
-    Route::post('/settings/maintenance', [SettingsController::class, 'maintenance'])
-        ->name('settings.maintenance');
+    Route::post('/settings/maintenance', [SettingsController::class, 'maintenance'])->name('settings.maintenance');
 });

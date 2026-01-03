@@ -39,12 +39,12 @@ class LoginController extends Controller
 
             $user = $this->authService->getUser();
 
-            // Redirect based on user role
-            return match($user->role) {
-                'admin' => redirect()->intended('/'),
-                'trainer' => redirect()->intended('/'),
-                'member' => redirect()->intended('/'),
-                default => redirect()->intended('/'),
+            // ✅ Force correct redirect after login
+            return match ($user->role) {
+                'admin'   => redirect()->route('dashboard'),
+                'trainer' => redirect('/dashboard'),
+                'member'  => redirect('/dashboard'),
+                default   => redirect('/dashboard'),
             };
         }
 

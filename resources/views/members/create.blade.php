@@ -19,7 +19,7 @@
                 <h5 class="mb-0"><i class="fas fa-user-circle me-2"></i>Member Information</h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('members.store') }}" method="POST">
+                <form action="{{ route('members.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
 
                     <div class="row">
