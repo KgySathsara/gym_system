@@ -170,8 +170,11 @@
                             <td>
                                 <div class="d-flex align-items-center">
                                     <div class="flex-shrink-0">
-                                        <img src="{{ $payment->member->user->profile_image ? asset('storage/' . $payment->member->user->profile_image) : asset('assets/images/default-avatar.png') }}"
-                                             alt="{{ $payment->member->user->name }}" class="rounded-circle" width="35" height="35">
+                                        <img src="{{ $payment->member->user->profile_image ? asset('storage/profiles/' . $payment->member->user->profile_image) : asset('assets/images/default-avatar.png') }}"
+                                            alt="{{ $payment->member->user->name }}"
+                                            class="rounded-circle"
+                                            width="35"
+                                            height="35">
                                     </div>
                                     <div class="flex-grow-1 ms-2">
                                         <h6 class="mb-0">{{ $payment->member->user->name }}</h6>

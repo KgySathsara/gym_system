@@ -76,8 +76,8 @@
                             <td>
                                 <div class="d-flex align-items-center">
                                     <div class="flex-shrink-0">
-                                        <img src="{{ $trainer->user->profile_image ? asset('storage/' . $trainer->user->profile_image) : asset('assets/images/default-avatar.png') }}"
-                                             alt="{{ $trainer->user->name }}" class="rounded-circle" width="40" height="40">
+                                        <img src="{{ $trainer->user->profile_image ? asset('storage/profiles/' . $trainer->user->profile_image) : asset('assets/images/default-avatar.png') }}"
+                                            alt="{{ $trainer->user->name }}" class="rounded-circle" width="40" height="40">
                                     </div>
                                     <div class="flex-grow-1 ms-3">
                                         <h6 class="mb-0">{{ $trainer->user->name }}</h6>

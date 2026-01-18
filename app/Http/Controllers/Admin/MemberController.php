@@ -61,23 +61,23 @@ class MemberController extends Controller
         return view('members.edit', compact('member', 'trainers', 'plans'));
     }
 
-public function update(UpdateMemberRequest $request, $id): RedirectResponse
-{
-    $data = $request->validated();
+    public function update(UpdateMemberRequest $request, $id): RedirectResponse
+    {
+        $data = $request->validated();
 
-    if ($request->hasFile('profile_image')) {
-        $this->memberService->updateMemberPhoto(
-            $id,
-            $request->file('profile_image')
-        );
+        if ($request->hasFile('profile_image')) {
+            $this->memberService->updateMemberPhoto(
+                $id,
+                $request->file('profile_image')
+            );
+        }
+
+        $this->memberService->updateMember($id, $data);
+
+        return redirect()
+            ->route('members.index')
+            ->with('success', 'Member updated successfully.');
     }
-
-    $this->memberService->updateMember($id, $data);
-
-    return redirect()
-        ->route('members.index')
-        ->with('success', 'Member updated successfully.');
-}
 
 
     public function destroy($id): RedirectResponse
